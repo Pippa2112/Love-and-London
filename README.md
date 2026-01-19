@@ -28,8 +28,8 @@ Allowed At-Rules: You can use @media (for mobile responsiveness), @container, @l
 
 The content Property Bug (JSON Conflict)
 This is a common "gotcha" for developers. If you try to use pseudo-elements like ::before or ::after with the content property (e.g., content: "";), the editor may fail to save.
-The Reason: The theme settings are saved as a JSON file in the backend. Sometimes, the quotation marks in content: "value" conflict with the JSON formatting, causing the save to fail.
-The Fix: You usually have to move this specific code to your main theme stylesheet (Edit Code > Assets > base.css or theme.css) rather than using the editor's Custom CSS box.
+- The Reason: The theme settings are saved as a JSON file in the backend. Sometimes, the quotation marks in content: "value" conflict with the JSON formatting, causing the save to fail.
+- The Fix: You usually have to move this specific code to your main theme stylesheet (Edit Code > Assets > base.css or theme.css) rather than using the editor's Custom CSS box.
 
 Performance Implications
 While convenient, relying heavily on these boxes can create "technical debt.
