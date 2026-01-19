@@ -112,3 +112,18 @@ For full Custom CSS Limitations, please read the readme.md file
   display: flex;
   justify-content: center;
 }
+
+/*   Image with Text on Help Hub   */
+.button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/*   FAQ with Tabs   */
+.accordion__title {
+  text-align: left;
+}
+.faq-tabs__tab-button {
+  text-transform: none;
+}
