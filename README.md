@@ -1,8 +1,23 @@
 # Love-and-London-Paris
 The updated website files for Love and London/Paris Shopify Websites. This repo includes all files that have been added, updated or changed. 
 
+***General Notes*** 
+Understanding the Hashtag (#) Syntax
+
+In CSS, the hashtag (`#`) represents an **ID Selector**. It is used to target a single, unique HTML element on the page.
+In Shopify Liquid templates, this is commonly combined with dynamic code to create **Scoped IDs**:
+`#Name-{{ section.id }}`
+
+Breakdown:
+1. **`#` (ID Selector):** Tells the browser to style a specific element based on its `id` attribute.
+2. **`{{ section.id }}` (Dynamic Liquid):** A placeholder that Shopify replaces with a unique alphanumeric string for that specific section instance.
+
+Why is this used?
+This pattern ensures **style isolation**. 
+If you add the same section (e.g., a Slideshow) to a page three times, each instance gets a unique ID (e.g., `#Slider-123`, `#Slider-456`). This allows the CSS to apply only to the intended section without breaking the layout of the others.
 
 
+*** STORE FRONT CUSTOM CSS ***
 NOTE: These are the full limitations of the storefront custom css section if changes are needed:
 These limitations apply to the "Custom CSS" fields found in two places:
 - Section-Level: Inside a specific section (e.g., a "Rich Text" or "Product Information" section).
