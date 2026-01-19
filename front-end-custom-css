@@ -1,0 +1,114 @@
+{%- comment -%}
+Shopify Storefront Custom CSS Limitations
+1. Hard Character Limits
+Section-Level: Max 500 characters (spaces/breaks included).
+Theme-Level: Max 1500 characters.
+Note: Code must often be minified to fit; extensive styling should move to theme assets.
+
+2. Syntax Restrictions
+No SCSS/Sass: Nesting is not supported (e.g., parent { child { ... } } is invalid). You must use standard CSS.
+Restricted At-Rules: @import, @charset, and @namespace are prohibited.
+Allowed At-Rules: @media, @container, @layer, and @supports work as expected.
+
+3. Scoping & Selectors
+The selector Keyword: Use selector { ... } to target the specific section wrapper dynamically.
+Isolation: You cannot style elements outside the current section (e.g., cannot style the Header from a Product Section).
+No Checkout Access: Custom CSS fields do not render on the Checkout page (requires Shopify Plus + Checkout Extensibility).
+
+4. Known Technical Conflicts
+JSON/Content Bug: Using the content property with quotes (e.g., content: ""; for pseudo-elements) often breaks the JSON save file.
+Workaround: Move code utilizing ::before/::after to the main stylesheet (base.css / theme.css).
+
+For full Custom CSS Limitations, please read the readme.md file
+{%- endcomment -%}
+
+
+/*     Collapsible Content   */
+/* Add a black background to the header */
+.collapsible-content__header {
+  background-color: #000000;
+  padding-top: 15px;
+  padding-bottom: 15px;
+} /* Make the heading text white and remove its bottom margin */
+.collapsible-content__heading {
+  color: #ffffff;
+  margin-bottom: 0;
+}
+
+/*   Multicolumn Section for Icons  */
+/* --- Make images smaller and centered --- */
+.multicolumn-card__image-wrapper {
+  max-width: 80px; /* Adjust this value to make icons bigger or smaller */
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0px;
+} /* --- Make images circular --- */
+.multicolumn-card__image {
+  border-radius: 10%;
+} /* --- Change column text color to black --- */
+.multicolumn-card__info 3,
+.multicolumn-card__info .rte {
+  color: #000000;
+}
+.multicolumn-card__info {
+  color: #000000;
+}
+.h2 {
+  text-align: center;
+}
+.inline-richtext h2 {
+  text-align: center;
+}
+
+/*   Multicolumn Section for Days Breakdown   */
+/* Make the entire group of columns narrower and centered */
+.multicolumn-list {
+  max-width: 100rem; /* Adjust this value to make the section wider or narrower */
+  margin-left: auto;
+  margin-right: auto;
+} /* Force the background of each column to be white */
+.multicolumn-card__info {
+  background-color: #ffffff;
+}
+
+/*   Multicolumn Section for CTA for other Itins   */
+.link {
+  padding: 10px;
+  padding-left: 15px;
+  background-color: #ff0000;
+  color: #ffffff;
+}
+
+/*   Multicolumn Section for 3 simple steps   */
+/* Style the main heading container */
+.multicolumn__title {
+  background-color: #000000;
+  padding: 1rem;
+  text-align: center !important;
+} /* Change the heading text to white */
+.multicolumn__title .title {
+  color: #ffffff;
+} /* Keep the text in the columns black */
+.multicolumn-card__info {
+  color: #000000;
+}
+
+/*   Multicolumn Section for Recommendations on Help Hub   */
+.multicolumn-card__image {
+  border-radius: 15px;
+}
+.multicolumn-list {
+  justify-content: center;
+}
+
+/*   Tab-with-content for Take a Peak section   */
+.tabs-with-content__tab-button {
+  text-transform: none;
+}
+
+/*   Video with Text on help hub   */
+.button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
