@@ -1,0 +1,231 @@
+{%- comment -%}
+  SECTION: Comparison Table
+  - Reverted to V1 with updated SVG icon images.
+{%- endcomment -%}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .comparison-table__table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid rgba(var(--color-foreground), 0.1);
+    font-size: 1.5rem;
+  }
+
+  .comparison-table__table th,
+  .comparison-table__table td {
+    padding: 1.5rem;
+    border: 1px solid rgba(var(--color-foreground), 0.1);
+    vertical-align: middle;
+  }
+
+  .comparison-table__table thead th {
+    font-size: 1.4rem;
+    color: {{ section.settings.header_color }};
+    font-weight: var(--font-body-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+  }
+
+  .comparison-table__cell--feature {
+    width: 60%;
+  }
+
+  .comparison-table__cell--check {
+    width: 20%;
+    text-align: center;
+  }
+
+  .comparison-table__cell--check img {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .table-row--header {
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .table-row--text {
+    padding-left: 3rem;
+  }
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="title center h1">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    <table class="comparison-table__table">
+      <thead>
+        <tr>
+          <th class="comparison-table__cell--feature">
+            {{ section.settings.column_1_heading }}
+          </th>
+          <th class="comparison-table__cell--check">
+            {{ section.settings.column_2_heading }}
+          </th>
+          <th class="comparison-table__cell--check">
+            {{ section.settings.column_3_heading }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for block in section.blocks -%}
+          <tr>
+            <td class="comparison-table__cell--feature">
+              <div class="{% if block.settings.row_style == 'header' %}table-row--header{% else %}table-row--text{% endif %}">
+                {{ block.settings.feature_text }}
+              </div>
+            </td>
+            <td class="comparison-table__cell--check">
+              {%- if block.settings.column_2_check -%}
+                <img src="https://cdn.shopify.com/s/files/1/0593/6509/7645/files/Check_Mark_1.svg?v=1755854660" alt="Checkmark" width="22" height="22">
+              {%- else -%}
+                <img src="https://cdn.shopify.com/s/files/1/0593/6509/7645/files/Cross_Mark_1.svg?v=1755854661" alt="Cross mark" width="22" height="22">
+              {%- endif -%}
+            </td>
+            <td class="comparison-table__cell--check">
+              {%- if block.settings.column_3_check -%}
+                <img src="https://cdn.shopify.com/s/files/1/0593/6509/7645/files/Check_Mark_1.svg?v=1755854660" alt="Checkmark" width="22" height="22">
+              {%- else -%}
+                <img src="https://cdn.shopify.com/s/files/1/0593/6509/7645/files/Cross_Mark_1.svg?v=1755854661" alt="Cross mark" width="22" height="22">
+              {%- endif -%}
+            </td>
+          </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Comparison table",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "header",
+      "content": "Column Headings"
+    },
+    {
+      "type": "text",
+      "id": "column_1_heading",
+      "label": "Column 1 Heading",
+      "info": "This is usually left blank."
+    },
+    {
+      "type": "text",
+      "id": "column_2_heading",
+      "label": "Column 2 Heading",
+      "default": "Basic Package:"
+    },
+    {
+      "type": "text",
+      "id": "column_3_heading",
+      "label": "Column 3 Heading",
+      "default": "Bonus Package:"
+    },
+    {
+      "type": "color",
+      "id": "header_color",
+      "label": "Header text color",
+      "default": "#D90429"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "table_row",
+      "name": "Row",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "select",
+          "id": "row_style",
+          "label": "Row style",
+          "options": [
+            { "value": "header", "label": "Header (H4 style)" },
+            { "value": "text", "label": "Text (indented)" }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "text",
+          "id": "feature_text",
+          "label": "Feature text (Column 1)",
+          "default": "Feature description"
+        },
+        {
+          "type": "checkbox",
+          "id": "column_2_check",
+          "label": "Included in Column 2",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "column_3_check",
+          "label": "Included in Column 3",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comparison table",
+      "blocks": [
+        { "type": "table_row" },
+        { "type": "table_row" },
+        { "type": "table_row" }
+      ]
+    }
+  ]
+}
+{% endschema %}
