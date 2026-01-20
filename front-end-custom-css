@@ -4,6 +4,7 @@ Shopify Storefront Custom CSS Limitations
 Section-Level: Max 500 characters (spaces/breaks included).
 Theme-Level: Max 1500 characters.
 Note: Code must often be minified to fit; extensive styling should move to theme assets.
+{%- endcomment -%}
 
 2. Syntax Restrictions
 No SCSS/Sass: Nesting is not supported (e.g., parent { child { ... } } is invalid). You must use standard CSS.
