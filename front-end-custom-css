@@ -101,6 +101,11 @@ For full Custom CSS Limitations, please read the readme.md file
   justify-content: center;
 }
 
+/*   Multicolumn Section for Homepage What do you need help with?   */
+.multicolumn-card__image {
+  border-radius: 15px;
+}
+
 /*   Tab-with-content for Take a Peak section   */
 .tabs-with-content__tab-button {
   text-transform: none;
@@ -120,6 +125,12 @@ For full Custom CSS Limitations, please read the readme.md file
   justify-content: center;
 }
 
+/*   Image with Text on All Homepage Sections  */
+.h1 {
+  color: #ff0000;
+  text-align: left;
+}
+
 /*   FAQ with Tabs   */
 .accordion__title {
   text-align: left;
@@ -127,3 +138,48 @@ For full Custom CSS Limitations, please read the readme.md file
 .faq-tabs__tab-button {
   text-transform: none;
 }
+
+/*   Slideshow Homepage Header Section   */ 
+.button {
+  background-color: #ff0000;
+  color: #ffffff;
+}
+
+/*   Logo List   */ 
+.logo-bar-item {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+.logo-bar__title .title {
+  margin: 0 auto;
+  text-align: center;
+}
+@media screen and (max-width: 749px) {
+  .logo-bar-container {
+    animation: auto-scroll;
+    width: auto;
+    display: flex;
+  }
+  .logo-bar-list {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 5px;
+  }
+  .logo-bar-item {
+    flex-shrink: 0;
+  }
+}
+
+/*   Featured Collection on Homepage (Hidden as of 12/25)   */ 
+.h2 {
+  text-align: center;
+}
+
+/*   Video with text on Help Hub   */
+.button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
