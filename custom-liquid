@@ -1,0 +1,16 @@
+/*   This file highlights the different custom liquid sections and what their code is used for   */ 
+
+/*   Product Information section on PDPs. Custom Liquid used for custom text styling  */ 
+<h2 style="color: #ff0000; text-align: left; letter-spacing: 1.5px; margin-bottom: 1rem;">
+  I’ve made your itinerary for you ✨
+</h3>
+
+/*   Product Information section on PDPs. Custom liquid used for the block text section. Originally listed as "UPDATED IN JUNE" text  */
+<div style="display: inline-flex; align-items: center; background-color: #D90429; color: white; font-weight: bold; padding: 6px 8px; border-radius: 0px; margin-bottom: 1rem; font-size: 20px;">
+  <img src="https://cdn.shopify.com/s/files/1/0593/6509/7645/files/L_L_-_PDP_icon_V2.png?v=1755766996" alt="Update icon" style="height: 40px; width: auto; margin-right: 8px;">
+  Updated June 2025
+  <span style="margin-left: 8px;"></span>
+</div>
+
+/*   Link Anchor Custom Liquid. This code is used to add a anchor link anywhere in the page. It defines where the link sends the user.   */ 
+<div id="map-section" style="display: block; position: relative; top: -100px; visibility: hidden;">&nbsp;</div>
