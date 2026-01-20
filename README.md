@@ -1,7 +1,8 @@
-# Love-and-London-Paris
+# Love-and-London
 The updated website files for Love and London/Paris Shopify Websites. This repo includes all files that have been added, updated or changed. 
 
 ***General Notes*** 
+
 Understanding the Hashtag (#) Syntax
 
 In CSS, the hashtag (`#`) represents an **ID Selector**. It is used to target a single, unique HTML element on the page.
