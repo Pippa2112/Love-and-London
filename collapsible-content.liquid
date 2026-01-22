@@ -2,6 +2,8 @@
 - Shopify Native Section, which was updated with the ability to add an image slideshow, video option and the ability to use a tertiary font.
 - Code was added to make slide show work, circular pagination, scroll option on mobile, automatic scroll disabled but functionality available in code.
 - Tertiary font added from the Love and London Brand Book provided. Font file uploaded as an option. 
+- V5 change includes removing the chevrons on desktop, adding them into mobile for scroll and making all images cover but contain them so no image bleed happens for continuous scroll.
+- V6 auto scroll added to match pagefly. 
 {%- endcomment -%}					
 					
 
@@ -22,38 +24,87 @@
     }
   }
 
+  /* FIX: Container overflow to stop bleeding images */
   .collapsible-content__media-slider {
     position: relative;
+    overflow: hidden;
+    width: 100%;
+    display: block; /* Ensure it behaves as a block */
   }
   
   .collapsible-content__media-slider .slider {
     display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    
+    /* CRITICAL FIXES FOR GAPS */
+    gap: 0 !important;        /* Removes default theme gap */
+    margin: 0 !important;     /* Removes default theme margins */
+    padding: 0 !important;    /* Removes default theme padding */
+    list-style: none;         /* Removes bullet points */
+    width: 100%;
+  }
+
+  /* Chrome/Safari: hide scrollbar */
+  .collapsible-content__media-slider .slider::-webkit-scrollbar {
+    display: none;
   }
 
   .collapsible-content__media-slider .slider__slide {
     display: block;
     flex: 0 0 100%;
+    width: 100%;
     min-width: 100%;
+    max-width: 100%; /* Force exact width */
+    scroll-snap-align: start; /* Snap to start is cleaner for full-width than center */
+    margin: 0 !important;     /* Reset any theme margins */
+    padding: 0 !important;    /* Reset any theme padding */
+    border: none;
   }
 
   .collapsible-content__slide video,
   .collapsible-content__slide img {
+    display: block; /* Removes bottom whitespace on inline images */
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
   }
 
+  /* BUTTON STYLES */
   .collapsible-content__media-slider .slider-buttons {
     display: flex;
     justify-content: center;
-    padding-top: 2rem;
-    gap: 1rem;
+    padding-top: 1rem;
+    gap: 0.8rem;
+    position: relative;
+    z-index: 2;
   }
 
+  /* Clean, small dots for mobile */
   .collapsible-content__media-slider .slider-counter__link--dots {
     border-radius: 50%;
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 1px solid rgba(var(--color-foreground), 0.5);
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .collapsible-content__media-slider .slider-counter__link--dots.active {
+    background: rgba(var(--color-foreground), 1);
+  }
+
+  /* HIDE BUTTONS ON DESKTOP */
+  @media screen and (min-width: 750px) {
+    .collapsible-content__media-slider .slider-buttons {
+      display: none;
+    }
   }
   
   {%- if section.settings.icon_color != blank -%}
@@ -87,7 +138,7 @@
         <div class="grid grid--1-col grid--2-col-tablet collapsible-content__grid{% if section.settings.desktop_layout == 'image_second' %} collapsible-content__grid--reverse{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
           {%- if section.settings.image_1 != blank or section.settings.image_2 != blank or section.settings.image_3 != blank or section.settings.video != blank -%}
             <div class="grid__item collapsible-content__grid-item">
-              <slider-component class="slider-mobile-gutter collapsible-content__media-slider">
+              <slider-component class="slider-mobile-gutter collapsible-content__media-slider" id="SliderComponent-{{ section.id }}">
                 <ul class="slider slider--everywhere" id="Slider-{{ section.id }}" role="list">
                   {%- if section.settings.image_1 != blank -%}
                     <li class="slider__slide collapsible-content__slide">
@@ -173,6 +224,69 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const sectionId = "{{ section.id }}";
+    const slider = document.getElementById(`Slider-${sectionId}`);
+    const buttons = document.querySelectorAll(`#SliderComponent-${sectionId} .slider-counter__link--dots`);
+    
+    if (!slider) return;
+
+    // --- AUTO SCROLL FUNCTIONALITY (DESKTOP) ---
+    let autoScrollInterval;
+    
+    function startAutoScroll() {
+      // Only run on desktop (min-width: 750px)
+      if (window.innerWidth >= 750) {
+        autoScrollInterval = setInterval(() => {
+          const slideWidth = slider.offsetWidth;
+          const maxScroll = slider.scrollWidth - slideWidth;
+          
+          // If we are at the end (or close enough), scroll back to start
+          if (slider.scrollLeft >= maxScroll - 10) {
+            slider.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            // Otherwise scroll to next slide
+            slider.scrollBy({ left: slideWidth, behavior: 'smooth' });
+          }
+        }, 4000); // Change 4000 to adjust speed (in milliseconds)
+      }
+    }
+
+    // Initialize Auto Scroll
+    startAutoScroll();
+
+    // Stop auto-scroll if user interacts (optional, good for UX)
+    slider.addEventListener('touchstart', () => clearInterval(autoScrollInterval));
+    slider.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+    slider.addEventListener('mouseleave', startAutoScroll);
+
+    // --- BUTTON CLICK FUNCTIONALITY (MOBILE) ---
+    buttons.forEach((btn, index) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const slideWidth = slider.offsetWidth;
+        slider.scrollTo({
+          left: slideWidth * index,
+          behavior: 'smooth'
+        });
+        
+        // Update active class
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Update active dot on scroll
+    slider.addEventListener('scroll', () => {
+       const slideWidth = slider.offsetWidth;
+       const index = Math.round(slider.scrollLeft / slideWidth);
+       buttons.forEach(b => b.classList.remove('active'));
+       if(buttons[index]) buttons[index].classList.add('active');
+    });
+  });
+</script>
 
 {% schema %}
 {
