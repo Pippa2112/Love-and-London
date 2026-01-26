@@ -24,7 +24,7 @@
   }
 
   .image-with-text--boxed {
-    border: 2.5px solid rgba(var(--color-foreground), 0.2); /* this section determins the line weight of the border. Colour is inherited from theme */ 
+    border: 2.5px solid rgba(var(--color-foreground), 0.2);
     border-radius: 1.5rem;
     padding: 2.5rem;
   }
@@ -39,8 +39,36 @@
      object-fit: {{ section.settings.image_fit }};
   }
 
-  .image-with-text__content .product-form {
+  .image-with-text__content .quick-add-button-wrapper {
     margin-top: 3rem;
+  }
+
+  /* Loading Spinner Styles */
+  .loading-overlay__spinner {
+    width: 1.8rem;
+    display: inline-block;
+  }
+  .spinner {
+    animation: rotator 1.4s linear infinite;
+  }
+  @keyframes rotator {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(270deg); }
+  }
+  .path {
+    stroke-dasharray: 280;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    stroke: currentColor;
+    animation: dash 1.4s ease-in-out infinite;
+  }
+  @keyframes dash {
+    0% { stroke-dashoffset: 280; }
+    50% { stroke-dashoffset: 75; transform: rotate(135deg); }
+    100% { stroke-dashoffset: 280; transform: rotate(450deg); }
+  }
+  .hidden {
+    display: none !important;
   }
 {%- endstyle -%}
 
@@ -105,32 +133,28 @@
                 {%- when 'button' -%}
                   {%- if block.settings.button_label != blank -%}
                     {%- if block.settings.product != blank -%}
-                      {%- assign product_form_id = 'product-form-' | append: section.id | append: block.id -%}
                       {%- assign product = block.settings.product -%}
-                      <product-form class="product-form">
-                        <div class="product-form__error-message-wrapper" role="alert" hidden>
-                          <span class="product-form__error-message"></span>
-                        </div>
-                        <form method="post" action="/cart/add" id="{{ product_form_id }}" class="form" enctype="multipart/form-data">
-                          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-                          <div class="product-form__buttons">
-                            <button
-                              type="submit"
-                              name="add"
-                              class="product-form__submit button button--full-width {% if block.settings.button_style_secondary %}button--secondary{% else %}button--primary{% endif %}"
-                              {% if product.selected_or_first_available_variant.available == false %}disabled{% endif %}
-                            >
-                              <span>
-                                {%- if product.selected_or_first_available_variant.available -%}
-                                  {{ block.settings.button_label | escape }}
-                                {%- else -%}
-                                  {{ 'products.product.sold_out' | t }}
-                                {%- endif -%}
-                              </span>
-                            </button>
+                      <div class="quick-add-button-wrapper">
+                        <button
+                          type="button"
+                          class="button button--full-width {% if block.settings.button_style_secondary %}button--secondary{% else %}button--primary{% endif %} js-add-to-cart"
+                          data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                          {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+                        >
+                          <span class="js-button-text">
+                            {%- if product.selected_or_first_available_variant.available -%}
+                              {{ block.settings.button_label | escape }}
+                            {%- else -%}
+                              {{ 'products.product.sold_out' | t }}
+                            {%- endif -%}
+                          </span>
+                          <div class="loading-overlay__spinner hidden">
+                            <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                              <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                            </svg>
                           </div>
-                        </form>
-                      </product-form>
+                        </button>
+                      </div>
                     {%- else -%}
                       <a
                         {% if block.settings.button_link == blank %}
@@ -153,6 +177,93 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.js-add-to-cart');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation(); // Stop event bubbling
+
+        const variantId = this.getAttribute('data-variant-id');
+        if (!variantId) return;
+
+        // Show loading state
+        this.setAttribute('disabled', true);
+        this.classList.add('loading');
+        const spinner = this.querySelector('.loading-overlay__spinner');
+        const textSpan = this.querySelector('.js-button-text');
+        
+        if(spinner) spinner.classList.remove('hidden');
+        if(textSpan) textSpan.classList.add('hidden');
+
+        // Prepare form data for adding to cart
+        const formData = {
+          'items': [{
+            'id': variantId,
+            'quantity': 1
+          }],
+          'sections': 'cart-drawer,cart-icon-bubble' // Ask for these sections to be returned
+        };
+
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Check for error in response data (e.g. sold out)
+          if (data.status) {
+             alert(data.description || 'Error adding to cart');
+             return;
+          }
+
+          // SUCCESS: Open the Cart Drawer
+          const cartDrawer = document.querySelector('cart-drawer');
+          const cartNotification = document.querySelector('cart-notification');
+
+          if (cartDrawer) {
+             // 1. Update the drawer content with the HTML returned by the API
+             cartDrawer.renderContents(data);
+             // 2. Add class to open the drawer
+             // NOTE: Depending on theme version, this might be 'active' or attribute 'open'
+             if (cartDrawer.classList.contains('is-empty')) cartDrawer.classList.remove('is-empty');
+             // Try standard methods to open
+             document.body.classList.add('overflow-hidden');
+             cartDrawer.classList.add('active'); // Common in Dawn
+             cartDrawer.setAttribute('open', ''); // Common in newer Dawn
+          } else if (cartNotification) {
+             cartNotification.renderContents(data);
+             cartNotification.classList.add('active');
+             cartNotification.setAttribute('open', '');
+          } else {
+             // Fallback: Redirect to cart if no drawer found
+             window.location.href = '/cart';
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          // Only alert if it's a real error, not a false positive syntax error from empty response
+          if (error.message !== 'Unexpected end of JSON input') {
+             alert('Error adding to cart. Please try again.');
+          }
+        })
+        .finally(() => {
+          // Remove loading state
+          this.removeAttribute('disabled');
+          this.classList.remove('loading');
+          if(spinner) spinner.classList.add('hidden');
+          if(textSpan) textSpan.classList.remove('hidden');
+        });
+      });
+    });
+  });
+</script>
 
 {% schema %}
 {
