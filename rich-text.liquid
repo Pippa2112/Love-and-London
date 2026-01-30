@@ -1,3 +1,13 @@
+{%- comment -%}
+- Shopify Native Section, which was updated with the ability to add a buy button
+- All custom css for these sections is within the GitHub file titled front-end-custom-css 
+- V3: updated to fix the issue that the app Yagi created by injecting its hard code into the functionality of the website. Added AJAX functionality
+to ensure that this section will remain independent from other apps in the future. 
+WARNING NOTE: Please be aware of the coding implications of apps for the website's functionality. This issue only happened due to the 
+choice of using Yagi. There are developer tools on all apps that explain the potential consequences of adding an app to your store.
+You should familiarise yourself with them prior to adding an app to avoid a delay in service. 
+{%- endcomment -%}		
+
 {{ 'section-rich-text.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}
@@ -11,6 +21,34 @@
       padding-top: {{ section.settings.padding_top }}px;
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
+  }
+
+  /* Loading Spinner Styles */
+  .loading-overlay__spinner {
+    width: 1.8rem;
+    display: inline-block;
+  }
+  .spinner {
+    animation: rotator 1.4s linear infinite;
+  }
+  @keyframes rotator {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(270deg); }
+  }
+  .path {
+    stroke-dasharray: 280;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    stroke: currentColor;
+    animation: dash 1.4s ease-in-out infinite;
+  }
+  @keyframes dash {
+    0% { stroke-dashoffset: 280; }
+    50% { stroke-dashoffset: 75; transform: rotate(135deg); }
+    100% { stroke-dashoffset: 280; transform: rotate(450deg); }
+  }
+  .hidden {
+    display: none !important;
   }
 {%- endstyle -%}
 
@@ -66,36 +104,29 @@
                   {%- if block.settings.add_to_cart and block.settings.product != blank -%}
                     {%- assign product_variant = block.settings.product.selected_or_first_available_variant -%}
                     {%- if product_variant -%}
-                      <product-form>
-                        <form
-                          method="post"
-                          action="/cart/add"
-                          id="product-form-{{ section.id }}-{{ block.id }}"
-                          accept-charset="UTF-8"
-                          class="form"
-                          enctype="multipart/form-data"
+                      <div class="quick-add-button-wrapper">
+                        <button
+                          type="button"
+                          class="button{% if block.settings.button_style_secondary %} button--secondary{% else %} button--primary{% endif %} js-add-to-cart"
+                          data-variant-id="{{ product_variant.id }}"
+                          {% if product_variant.available == false %}
+                            disabled
+                          {% endif %}
                         >
-                          <input type="hidden" name="form_type" value="product">
-                          <input type="hidden" name="utf8" value="✓">
-                          <input type="hidden" name="id" value="{{ product_variant.id }}">
-                          <button
-                            type="submit"
-                            name="add"
-                            class="button{% if block.settings.button_style_secondary %} button--secondary{% else %} button--primary{% endif %}"
-                            {% if product_variant.available == false %}
-                              disabled
-                            {% endif %}
-                          >
-                            <span>
-                              {%- if product_variant.available -%}
-                                {{- block.settings.button_label | escape -}}
-                              {%- else -%}
-                                {{ 'products.product.sold_out' | t }}
-                              {%- endif -%}
-                            </span>
-                          </button>
-                        </form>
-                      </product-form>
+                          <span class="js-button-text">
+                            {%- if product_variant.available -%}
+                              {{- block.settings.button_label | escape -}}
+                            {%- else -%}
+                              {{ 'products.product.sold_out' | t }}
+                            {%- endif -%}
+                          </span>
+                          <div class="loading-overlay__spinner hidden">
+                            <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                              <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                            </svg>
+                          </div>
+                        </button>
+                      </div>
                     {%- endif -%}
                   {%- else -%}
                     <a
@@ -129,6 +160,107 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // FIX: Select only buttons that haven't been initialized yet to prevent double-firing
+    const buttons = document.querySelectorAll('.js-add-to-cart:not(.initialized)');
+
+    buttons.forEach(button => {
+      // Mark as initialized immediately
+      button.classList.add('initialized');
+
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation(); // Stop event bubbling
+        e.stopImmediatePropagation(); // Ensure no other listeners fire
+
+        const variantId = this.getAttribute('data-variant-id');
+        if (!variantId) return;
+
+        // Show loading state
+        this.setAttribute('disabled', true);
+        this.classList.add('loading');
+        const spinner = this.querySelector('.loading-overlay__spinner');
+        const textSpan = this.querySelector('.js-button-text');
+        
+        if(spinner) spinner.classList.remove('hidden');
+        if(textSpan) textSpan.classList.add('hidden');
+
+        // Prepare form data for adding to cart
+        const formData = {
+          'items': [{
+            'id': variantId,
+            'quantity': 1
+          }],
+          'sections': 'cart-drawer,cart-icon-bubble' // Ask for these sections to be returned
+        };
+
+        // Fallback to /cart/add.js if window.routes isn't available
+        const cartAddUrl = (window.routes && window.routes.cart_add_url) ? window.routes.cart_add_url : '/cart/add.js';
+
+        fetch(cartAddUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => {
+          if (!response.ok) {
+             throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Check for error in response data (e.g. sold out)
+          if (data.status) {
+             // Only alert if it's a genuine error that prevented adding
+             console.error('Cart Error:', data.description);
+             alert(data.description || 'Error adding to cart');
+             return;
+          }
+
+          // SUCCESS: Open the Cart Drawer
+          const cartDrawer = document.querySelector('cart-drawer');
+          const cartNotification = document.querySelector('cart-notification');
+
+          if (cartDrawer) {
+             // 1. Update the drawer content with the HTML returned by the API
+             cartDrawer.renderContents(data);
+             // 2. Add class to open the drawer
+             if (cartDrawer.classList.contains('is-empty')) cartDrawer.classList.remove('is-empty');
+             // Try standard methods to open
+             document.body.classList.add('overflow-hidden');
+             cartDrawer.classList.add('active'); // Common in Dawn
+             cartDrawer.setAttribute('open', ''); // Common in newer Dawn
+          } else if (cartNotification) {
+             cartNotification.renderContents(data);
+             cartNotification.classList.add('active');
+             cartNotification.setAttribute('open', '');
+          } else {
+             // Fallback: Redirect to cart if no drawer found
+             window.location.href = '/cart';
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          // Only alert if it's a real error, not a false positive
+          if (error.message && error.message !== 'Unexpected end of JSON input') {
+             alert('Error adding to cart. Please try again.');
+          }
+        })
+        .finally(() => {
+          // Remove loading state
+          this.removeAttribute('disabled');
+          this.classList.remove('loading');
+          if(spinner) spinner.classList.add('hidden');
+          if(textSpan) textSpan.classList.remove('hidden');
+        });
+      });
+    });
+  });
+</script>
 
 {% schema %}
 {
