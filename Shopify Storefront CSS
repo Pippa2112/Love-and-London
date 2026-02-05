@@ -1,0 +1,522 @@
+/* =============================================================================
+SHOPIFY STOREFRONT EDITOR - CUSTOM CSS HANDOVER
+=============================================================================
+Description: 
+This document contains CSS snippets for various Shopify sections.
+Note:
+When pasting the code, delete the commented out section (/* Comment */). There is a
+size limit of 500 characters. 
+Usage: 
+Copy the relevant code block and paste it into the "Custom CSS" 
+setting found at the bottom of the specific Section settings in the Theme Editor.
+=============================================================================
+*/
+
+/* =========================================
+   SECTION: Multicolumn
+   ========================================= */
+
+/* To add rounded corners to the image card */
+.multicolumn-card__image {
+  border-radius: 15px;
+}
+
+/* To center the text content within the column */
+.multicolumn-card__info {
+  text-align: center;
+}
+
+/* To remove the default background color of the card to make it transparent */
+.multicolumn-card {
+  background: transparent;
+}
+
+/* To add a subtle shadow on hover (Interactive feel) */
+.multicolumn-card:hover {
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* -----------------------------------------
+   Spacing & Layout Adjustments
+   ----------------------------------------- */
+
+/* Center the blocks within the section */
+/* Useful if you have 2 columns but the section is set to a 3-column layout */
+.multicolumn-list {
+  justify-content: center;
+}
+
+/* Change the gap size between columns */
+/* Note: If the columns push off the page, reduce the gap number or the column width */
+.multicolumn-list {
+  column-gap: 20px; /* Horizontal space between columns */
+  row-gap: 40px;    /* Vertical space between rows */
+}
+
+/* Ensure images and cards don't exceed their containers when gaps are added */
+.multicolumn-list__item {
+  max-width: 100%;
+}
+
+/* Change font size for the Heading */
+.multicolumn-card__info h3 {
+  font-size: 24px;
+  /* line-height: 1.2; */ /* Optional: Adjust line height */
+}
+
+/* Change font size for the Body text */
+.multicolumn-card__info .rte {
+  font-size: 16px;
+}
+
+/* -----------------------------------------
+   Internal Element Spacing (Independently)
+   ----------------------------------------- */
+
+/* Increase gap between Image and Text Content */
+.multicolumn-card__image-wrapper {
+  margin-bottom: 25px; 
+}
+
+/* Increase gap between Heading and Body text */
+.multicolumn-card__info h3 {
+  margin-bottom: 15px;
+}
+
+/* Increase gap between Body text and Button/Link */
+.multicolumn-card__info .rte {
+  margin-bottom: 20px;
+}
+
+/* -----------------------------------------
+   Image Overlay
+   ----------------------------------------- */
+
+/* Add a dark overlay on top of the image */
+.multicolumn-card__image-wrapper {
+  position: relative; /* Essential for the overlay to sit correctly */
+}
+
+.multicolumn-card__image-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* Black with 30% opacity */
+  pointer-events: none; /* Allows clicks to pass through to the link */
+  z-index: 1;
+  /* border-radius: 15px; */ /* Match this to your image border radius if used */
+}
+
+/* =========================================
+   SECTION: Rich Text
+   ========================================= */
+
+/* Adjust colors for Heading, Caption, and List Markers */
+.rich-text__heading {
+  color: #ff0000;
+}
+.rich-text__caption {
+  color: #ff0000;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.rich-text__text li::marker {
+  color: #ff0000;
+}
+
+/* Change font sizes for Heading and Body text */
+.rich-text__heading {
+  font-size: 32px;
+}
+.rich-text__text {
+  font-size: 18px;
+}
+
+/* Adjust the width of the text container */
+/* Note: Shopify uses sizes like 'small', 'medium', 'large' in settings. Use this to force a custom width. */
+.rich-text__blocks {
+  max-width: 800px !important;
+  margin: 0 auto;
+}
+
+/* Increase spacing between blocks (Heading, Text, Button) */
+.rich-text__blocks > * {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Customize the button within the Rich Text section */
+/* Note: This adds a border radius to the button */
+.rich-text__buttons .button {
+  padding: 15px 40px;
+  border-radius: 50px 
+}
+
+/* Align text to left/right/center (Overrides theme settings) */
+.rich-text__wrapper {
+  text-align: center;
+}
+
+/* =========================================
+   SECTION: Image with Text
+   ========================================= */
+
+/* Add rounded corners to the image */
+.image-with-text__media {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Adjust Heading size and color */
+.image-with-text__heading {
+  font-size: 28px;
+  color: #000000;
+}
+
+/* Adjust Body text size */
+.image-with-text__text {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Adjust spacing between the image and the text content */
+/* Note: Increase the 'gap' to push the two sides further apart */
+.image-with-text__grid {
+  column-gap: 50px;
+}
+
+/* Customize the button */
+.image-with-text__content .button {
+  border-radius: 50px;
+  padding: 12px 30px;
+}
+
+/* Add a background color to the text card and center content vertically */
+.image-with-text__content {
+  background-color: transparent; /* Change to #f4f4f4 for a light grey box */
+  padding: 40px !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center; /* Vertically centers the text and buttons */
+}
+
+/* =========================================
+   SECTION: Image Banner
+   ========================================= */
+
+/* Adjust the overall height of the banner */
+.banner {
+  min-height: 500px; /* Forces a minimum height */
+}
+
+/* Custom Image Overlay (Darken/Lighten) */
+.banner__media::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2); /* Adjust 0.2 to change darkness */
+}
+
+/* Styling the Text Content Box */
+.banner__content {
+  padding: 5rem; /* Space around the text within the banner */
+}
+
+/* Rounded corners for the banner text box (if 'show container' is on) */
+.banner__box {
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+}
+
+/* Heading styling */
+.banner__heading {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+/* Button Customization */
+.banner__buttons .button {
+  border-radius: 50px;
+  padding: 15px 40px;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+}
+
+/* Ensure buttons follow the "No Box" rule if the red line appears here too */
+.banner__buttons .button::after {
+  content: none !important;
+}
+
+/* =========================================
+   SECTION: Image Banner
+   ========================================= */
+
+/* Adjust the overall height of the banner */
+.banner {
+  min-height: 500px; /* Forces a minimum height */
+}
+
+/* Custom Image Overlay (Darken/Lighten) */
+.banner__media::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2); /* Adjust 0.2 to change darkness */
+}
+
+/* Styling the Text Content Box */
+.banner__content {
+  padding: 5rem; /* Space around the text within the banner */
+}
+
+/* Rounded corners for the banner text box (if 'show container' is on) */
+.banner__box {
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+}
+
+/* Heading styling */
+.banner__heading {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+/* Button Customization */
+.banner__buttons .button {
+  border-radius: 50px;
+  padding: 15px 40px;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+}
+
+/* Ensure buttons follow the "No Box" rule if the red line appears here too */
+.banner__buttons .button::after {
+  content: none !important;
+}
+
+/* =========================================
+   SECTION: Collage
+   ========================================= */
+
+/* Add rounded corners to all items in the collage */
+.collage__item {
+  border-radius: 15px;
+  overflow: hidden; /* Ensures image/video follows radius */
+}
+
+/* Add space between collage items */
+.collage {
+  column-gap: 20px;
+  row-gap: 20px;
+}
+
+/* Style the video card play button if a video is included */
+.collage .deferred-media__poster-button {
+  background-color: rgba(255, 0, 0, 0.8);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+}
+
+/* Add a shadow effect to the collage items */
+.collage__item {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.collage__item:hover {
+  transform: scale(1.02);
+}
+
+/* Adjust heading size for collage blocks */
+.collage-content__heading {
+  font-size: 20px;
+}
+
+/* Mobile: Adjust spacing for the vertical stack */
+@media screen and (max-width: 749px) {
+  .collage {
+    row-gap: 15px;
+  }
+}
+
+/* =========================================
+   SECTION: Multirow
+   ========================================= */
+
+/* Targeted Rounded Corners for Multirow */
+/* Using the confirmed working selector for images in this stacked layout */
+.image-with-text__media img {
+  border-radius: 15px !important;
+  overflow: hidden !important;
+}
+
+/* Vertical spacing between stacked row items */
+.image-with-text {
+  margin-bottom: 40px;
+}
+
+/* Hover effects for the row blocks */
+.image-with-text__grid {
+  transition: transform 0.3s ease;
+}
+
+.image-with-text__grid:hover {
+  transform: scale(1.01);
+}
+
+/* Adjust heading size for the row content */
+.image-with-text__heading {
+  font-size: 24px;
+}
+
+/* Space between image and text block within the grid */
+.image-with-text__grid {
+  column-gap: 40px;
+}
+
+/* =========================================
+   SECTION: Collapsible Content
+   ========================================= */
+
+/* Targeted Rounded Corners for Collapsible Content Image */
+.collapsible-content img,
+.collapsible-content__media img {
+  border-radius: 15px !important;
+  overflow: hidden !important;
+}
+
+/* Add border and rounded corners to the accordion items */
+/* Taste theme typically uses .accordion or details tags */
+.collapsible-content .accordion,
+.collapsible-content details {
+  border: 1px solid rgba(var(--color-foreground), 0.1);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 0 15px;
+}
+
+/* Change the background on hover */
+.collapsible-content summary:hover {
+  background-color: rgba(var(--color-foreground), 0.03);
+}
+
+/* Customize the heading inside the summary */
+.collapsible-content summary .accordion__title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Adjust spacing for the content when open */
+.collapsible-content .accordion__content {
+  padding-bottom: 20px;
+  font-size: 15px;
+}
+
+/* Increase gap between the image and the content area */
+.collapsible-content__grid {
+  column-gap: 50px;
+}
+
+/* =========================================
+   SECTION: Video
+   ========================================= */
+
+/* Add rounded corners to the Video player container */
+.video-section__media,
+.video-section__media .video-section__poster,
+.video-section__media deferred-media {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+/* Ensure the video element inside respects the radius */
+.video-section__media video,
+.video-section__media iframe {
+  border-radius: 20px !important;
+}
+
+/* Customize the Play Button */
+.video-section__media .deferred-media__poster-button {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  transition: transform 0.3s ease;
+}
+
+.video-section__media .deferred-media__poster-button:hover {
+  transform: scale(1.1);
+}
+
+/* Adjust heading size for the Video section */
+.video-section__content .title {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+/* Add spacing around the video section */
+.video-section {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+/* =========================================
+   SECTION: Product Information
+   ========================================= */
+
+/* Rounded corners for product gallery images */
+.product__media-list .product__media-item img,
+.product__media-wrapper .global-media-settings {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+/* Adjust Product Title style */
+.product__title h1 {
+  font-size: 36px;
+  letter-spacing: -0.02em;
+}
+
+/* Customize Price display */
+.price {
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(var(--color-foreground), 0.8);
+}
+
+/* Add-to-cart and Buy-now button styling */
+.product-form__buttons .button {
+  border-radius: 50px !important;
+  padding: 15px 40px;
+  text-transform: uppercase;
+}
+
+/* Remove the "box/shadow" border effect specific to Taste buttons */
+.product-form__buttons .button::after {
+  content: none !important;
+}
+
+/* Rounded corners for quantity input */
+.quantity {
+  border-radius: 30px;
+  border: 1px solid rgba(var(--color-foreground), 0.1);
+}
+
+/* Variant picker (pill) styling */
+.product-form__input--pill input[type='radio'] + label {
+  border-radius: 25px;
+  padding: 8px 20px;
+}
