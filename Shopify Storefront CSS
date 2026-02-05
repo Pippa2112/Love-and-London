@@ -256,56 +256,6 @@ setting found at the bottom of the specific Section settings in the Theme Editor
 }
 
 /* =========================================
-   SECTION: Image Banner
-   ========================================= */
-
-/* Adjust the overall height of the banner */
-.banner {
-  min-height: 500px; /* Forces a minimum height */
-}
-
-/* Custom Image Overlay (Darken/Lighten) */
-.banner__media::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.2); /* Adjust 0.2 to change darkness */
-}
-
-/* Styling the Text Content Box */
-.banner__content {
-  padding: 5rem; /* Space around the text within the banner */
-}
-
-/* Rounded corners for the banner text box (if 'show container' is on) */
-.banner__box {
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
-}
-
-/* Heading styling */
-.banner__heading {
-  font-size: 42px;
-  margin-bottom: 20px;
-}
-
-/* Button Customization */
-.banner__buttons .button {
-  border-radius: 50px;
-  padding: 15px 40px;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-}
-
-/* Ensure buttons follow the "No Box" rule if the red line appears here too */
-.banner__buttons .button::after {
-  content: none !important;
-}
-
-/* =========================================
    SECTION: Collage
    ========================================= */
 
