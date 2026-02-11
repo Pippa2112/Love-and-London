@@ -1,11 +1,10 @@
 {%- comment -%}
   This section creates an infinitely scrolling carousel of logos.
-  - V6 Changes: Increased default logo width and spacing between logos.
+  - V7 Changes: Added !important overrides to fix conflicts with Theme Editor Custom CSS.
+  - Fixes: Restored background color, forced removal of scrollbars, repaired mobile animation.
   - Settings: Control title, padding, color scheme, scroll speed, and logo height.
   - Blocks: Add up to 20 logos, each with an optional link and adjustable width.
 {%- endcomment -%}
-
-{{ 'component-slider.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}
   .section-{{ section.id }}-padding {
@@ -20,8 +19,13 @@
     }
   }
 
+  /* --- CORE CONTAINER STYLES --- */
   .logo-bar-section {
-    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+    display: block;
+    max-width: 100vw;
+    /* Removed 'background: transparent' so Scheme 3 (Black) shows through */
   }
 
   .logo-bar__title {
@@ -29,16 +33,38 @@
     text-align: center !important;
   }
 
+  /* MASK: The window that clips the content */
+  .logo-bar-mask {
+    width: 100%;
+    overflow: hidden !important; /* Force clipping */
+    position: relative;
+    touch-action: pan-y;
+    
+    /* Hide scrollbars strictly */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .logo-bar-mask::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* SLIDER CONTAINER */
   .logo-bar-container {
     --animation-speed: {{ section.settings.speed }}s;
-    width: 200%;
+    width: 200%; 
     display: flex;
     flex-wrap: nowrap;
+    transform: translate3d(0, 0, 0); 
+    will-change: transform;
     animation: scroll var(--animation-speed) linear infinite;
   }
 
-  .logo-bar-section:hover .logo-bar-container {
-    animation-play-state: paused;
+  /* --- ANIMATION CONTROL --- */
+  @media (hover: hover) and (pointer: fine) {
+    .logo-bar-section:hover .logo-bar-container {
+      animation-play-state: paused;
+    }
   }
 
   .logo-bar-list {
@@ -50,19 +76,16 @@
   }
 
   @keyframes scroll {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 
   .logo-bar-item {
-    padding: 0 2.5rem; /* Increased spacing */
+    padding: 0 2.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
   }
 
   .logo-bar-item img {
@@ -70,6 +93,43 @@
     height: auto;
     width: 100%;
     object-fit: contain;
+    display: block; 
+  }
+
+  /* --- MOBILE CONFLICT OVERRIDES --- */
+  /* We use !important here to defeat the conflicting Custom CSS from the theme editor */
+  @media screen and (max-width: 749px) {
+    
+    /* 1. Force the container to be wide enough to scroll (overriding 'width: auto') */
+    .logo-bar-container {
+      width: 200% !important; 
+      animation: scroll var(--animation-speed) linear infinite !important;
+      display: flex !important;
+    }
+
+    /* 2. Force the list to hide scrollbars (overriding 'overflow-x: auto') */
+    .logo-bar-list {
+      width: 50% !important;
+      overflow: hidden !important; 
+      padding-bottom: 0 !important;
+      justify-content: space-around !important;
+    }
+
+    /* 3. Resize logos properly */
+    .logo-bar-item {
+      padding: 0 1rem;
+      max-width: 160px !important; 
+      width: 40vw !important; 
+      flex-shrink: 0 !important;
+    }
+
+    .logo-bar-item img {
+      max-height: {{ section.settings.logo_height | times: 0.6 }}px;
+    }
+    
+    .logo-bar__title {
+      margin-bottom: 1.5rem;
+    }
   }
 {%- endstyle -%}
 
@@ -88,32 +148,36 @@
     -%}
 
     {%- if section.blocks.size > 0 -%}
-      <div class="logo-bar-container">
-        <div class="logo-bar-list">
-          {%- for block in section.blocks -%}
-            <div class="logo-bar-item" style="width: {{ block.settings.logo_width }}px;" {{ block.shopify_attributes }}>
-              {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{%- endif -%}
-              {%- if block.settings.image != blank -%}
-                {{ block.settings.image | image_url: height: image_height | image_tag: loading: 'lazy', alt: block.settings.image.alt | default: 'Logo', height: section.settings.logo_height }}
-              {%- else -%}
-                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
-              {%- endif -%}
-              {%- if block.settings.link != blank -%}</a>{%- endif -%}
-            </div>
-          {%- endfor -%}
-        </div>
-        <div class="logo-bar-list" aria-hidden="true">
-          {%- for block in section.blocks -%}
-            <div class="logo-bar-item" style="width: {{ block.settings.logo_width }}px;">
-               {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{%- endif -%}
-              {%- if block.settings.image != blank -%}
-                {{ block.settings.image | image_url: height: image_height | image_tag: loading: 'lazy', alt: block.settings.image.alt | default: 'Logo', height: section.settings.logo_height }}
-              {%- else -%}
-                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
-              {%- endif -%}
-              {%- if block.settings.link != blank -%}</a>{%- endif -%}
-            </div>
-          {%- endfor -%}
+      <div class="logo-bar-mask"> 
+        <div class="logo-bar-container">
+          <!-- List 1 -->
+          <div class="logo-bar-list">
+            {%- for block in section.blocks -%}
+              <div class="logo-bar-item" style="width: {{ block.settings.logo_width }}px;" {{ block.shopify_attributes }}>
+                {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{%- endif -%}
+                {%- if block.settings.image != blank -%}
+                  {{ block.settings.image | image_url: height: image_height | image_tag: loading: 'lazy', alt: block.settings.image.alt | default: 'Logo', height: section.settings.logo_height }}
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+                {%- if block.settings.link != blank -%}</a>{%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+          <!-- List 2 (Duplicate) -->
+          <div class="logo-bar-list" aria-hidden="true">
+            {%- for block in section.blocks -%}
+              <div class="logo-bar-item" style="width: {{ block.settings.logo_width }}px;">
+                 {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{%- endif -%}
+                {%- if block.settings.image != blank -%}
+                  {{ block.settings.image | image_url: height: image_height | image_tag: loading: 'lazy', alt: block.settings.image.alt | default: 'Logo', height: section.settings.logo_height }}
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+                {%- if block.settings.link != blank -%}</a>{%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
         </div>
       </div>
     {%- endif -%}
